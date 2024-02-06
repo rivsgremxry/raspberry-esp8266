@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP8266 Data</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        integrity="sha512-0CmrABZ2d3sSw4C2jw6WzQfIm6nPfzHRqZ2sNOgbSYT+Sbl8aivOtrGOW+T89TZx4v8xQ+9ZFWccW1yL4+MnFw=="
+        crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container mt-3">
+        <div>
+            <div>
+                <h2>Коридор</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <!-- <th class="mb-2">ID</th> -->
+                            <!-- <th class="mb-2">Name</th> -->
+                            <th class="mb-2">Temperature <i class="fas fa-thermometer-half" style="color: #60cb5c;"></i>
+                            </th>
+                            <th class="mb-2">Humidity <i class="fas fa-tint" style="color: #5ea7ca;"></i></th>
+                            <th class="mb-2">Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody style="text-align: center;">
+                        <tr>
+                            <!-- <td>{{ latest_data_esp8266_1.id if latest_data_esp8266_1 else 'N/A' }}</td> -->
+                            <!-- <td>{{ latest_data_esp8266_1.name if latest_data_esp8266_1 else 'N/A' }}</td> -->
+                            <td>{{ latest_data_esp8266_1.temperature if latest_data_esp8266_1 else 'N/A' }}</td>
+                            <td>{{ latest_data_esp8266_1.humidity if latest_data_esp8266_1 else 'N/A' }}</td>
+                            <td>{{ latest_data_esp8266_1.timestamp.strftime('%H:%M') if latest_data_esp8266_1 and
+                                latest_data_esp8266_1.timestamp else 'N/A' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div>
+                <h2>Спальня</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <!-- <th>ID</th> -->
+                            <!-- <th>Name</th> -->
+                            <th>Temperature <i class="fas fa-thermometer-half" style="color: #60cb5c;"></i></th>
+                            <th>Humidity <i class="fas fa-tint" style="color: #5ea7ca;"></i></th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody style="text-align: center;">
+                        <tr>
+                            <!-- <td>{{ latest_data_esp8266_2.id if latest_data_esp8266_2 else 'N/A' }}</td> -->
+                            <!-- <td>{{ latest_data_esp8266_2.name if latest_data_esp8266_2 else 'N/A' }}</td> -->
+                            <td>{{ latest_data_esp8266_2.temperature if latest_data_esp8266_2 else 'N/A' }}</td>
+                            <td>{{ latest_data_esp8266_2.humidity if latest_data_esp8266_2 else 'N/A' }}</td>
+                            <td>{{ latest_data_esp8266_2.timestamp.strftime('%H:%M') if latest_data_esp8266_2 and
+                                latest_data_esp8266_2.timestamp else 'N/A' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="display: flex; justify-content: space-around;">
+                <div>
+                    <h2></h2>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Average temperature <i class="fas fa-thermometer-half" style="color: #60cb5c;"></i>
+                                </th>
+                                <th>Average humidity <i class="fas fa-tint" style="color: #5ea7ca;"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody style="text-align: center;">
+                            <td>{{ avg_data_temperature|default('N/A') }}</td>
+                            <td>{{ avg_data_humidity|default('N/A') }}</td>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

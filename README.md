@@ -5,6 +5,15 @@ This is a small project to use a combination of ESP8266 and Raspberry Pi to obta
 
 Below are instructions for those who want to repeat this project. The project is still under development and will be improved over time. There are plans to add a separate page for managing the task scheduler, as well as more graphics for viewing changes in temperature and humidity over the course of an hour, day, week, month, etc.
 
+## Connecting the DHT11 sensor to ESP8266
+
+<img src="static/description/schema.png" width="500">
+
+```bash
+  DHT11 GND -> ESP8266 GND
+  DHT11 DAT -> ESP8266 D5
+  DHT11 VCC -> ESP8266 3V3
+```
 
 ## Deployment
 

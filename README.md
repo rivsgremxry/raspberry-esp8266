@@ -3,7 +3,8 @@
 
 This is a small project to use a combination of ESP8266 and Raspberry Pi to obtain data on humidity and temperature in an apartment and output it to a web server.
 
-Below are instructions for those who want to repeat this project. The project is still under development and will be improved over time. There are plans to add a separate page for managing the task scheduler, as well as more graphics for viewing changes in temperature and humidity over the course of an hour, day, week, month, etc.
+Below are instructions for those who want to repeat this project. 
+`The project is still under development and will be improved over time. There are plans to add a separate page for managing the task scheduler, as well as more graphics for viewing changes in temperature and humidity over the course of an hour, day, week, month, etc.`
 
 ## Connecting the DHT11 sensor to ESP8266
 

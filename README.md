@@ -87,7 +87,6 @@ Installing and checking Python and pip version on Raspberry Pi
 ```bash
   Replace:
 * SQLALCHEMY_DATABASE_URI to your psql user, psql password & psql database name;
-* Number of sensors;
 * Set up the task scheduler or delete/comment it out if you don't need it.
 ```
 

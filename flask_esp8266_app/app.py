@@ -49,14 +49,17 @@ def clear_data():
 # Define a function to configure and start the scheduled tasks
 def configure_schedule():
     while True:
+        # Retrieve scheduler configuration from the database
         config = SchedulerConfig.query.first()
 
         if config and config.scheduler_enabled:
+            # Schedule tasks based on the configuration
             if config.schedule_type == "daily":
                 schedule.every().day.at(config.selected_time).do(clear_data)
             elif config.schedule_type == "weekly":
                 schedule.every().week.at(config.selected_time).do(clear_data)
 
+        # Run pending scheduled tasks
         schedule.run_pending()
         time.sleep(1)
 
@@ -120,7 +123,7 @@ def index():
         else None
     )
 
-    # Render the index.html template with data
+    # Render the index.html template with data and a link to the daily graphs
     return render_template(
         "index.html",
         sensor_data_list=sensor_data_list,
@@ -155,7 +158,7 @@ def add_data():
 @app.route("/configure_schedule", methods=["GET", "POST"])
 def configure_schedule_route():
     if request.method == "POST":
-        # Retrieve form data
+        # Retrieve form data for scheduler configuration
         toggle_status = request.form.get("toggle_status")
         schedule_type = request.form.get("schedule_type")
         selected_time = request.form.get("selected_time")
@@ -166,10 +169,12 @@ def configure_schedule_route():
         # Save or update the scheduler configuration in the database
         config = SchedulerConfig.query.first()
         if config:
+            # Update existing configuration
             config.scheduler_enabled = scheduler_enabled
             config.schedule_type = schedule_type
             config.selected_time = selected_time
         else:
+            # Create new configuration entry
             config = SchedulerConfig(
                 scheduler_enabled=scheduler_enabled,
                 schedule_type=schedule_type,
@@ -188,6 +193,7 @@ def configure_schedule_route():
             schedule_type = config.schedule_type
             selected_time = config.selected_time
         else:
+            # Default values if no configuration is found
             scheduler_enabled = False
             schedule_type = "daily"
             selected_time = "00:00"
@@ -207,7 +213,7 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
 
-    # Configure and start the scheduled tasks
+    # Configure and start the scheduled tasks in a separate thread
     scheduler_thread = Thread(target=configure_schedule)
     scheduler_thread.start()
 

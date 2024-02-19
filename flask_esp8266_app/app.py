@@ -1,11 +1,9 @@
 # Import necessary libraries and modules
 from flask import Flask, request, render_template
-from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from models import db, SensorData, SchedulerConfig
+from threading import Thread
 import schedule
 import time
-import pytz
-from threading import Thread
 
 # Create a Flask web application
 app = Flask(__name__)
@@ -15,28 +13,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = (
     "postgresql://flask_esp:flask_esp@localhost/flask_esp"
 )
 
-# Create a SQLAlchemy database instance
-db = SQLAlchemy(app)
-
-
-# Define a database model for sensor data
-class SensorData(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    humidity = db.Column(db.Float)
-    temperature = db.Column(db.Float)
-    timestamp = db.Column(
-        db.TIMESTAMP, default=lambda: datetime.now(pytz.timezone("Europe/Riga"))
-    )
-
-
-# Define a database model for scheduler configuration
-class SchedulerConfig(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    scheduler_enabled = db.Column(db.Boolean)
-    schedule_type = db.Column(db.String(20))
-    selected_time = db.Column(db.String(5))
-
+db.init_app(app)
 
 # Define a function to clear all data in the SensorData table
 def clear_data():
@@ -86,9 +63,9 @@ def index():
         if latest_data:
             # Define a new name for each sensor
             display_name = (
-                "Corridor"
+                "Коридор"
                 if sensor_name[0] == "esp8266-1"
-                else "Bedroom" if sensor_name[0] == "esp8266-2" else sensor_name[0]
+                else "Спальня" if sensor_name[0] == "esp8266-2" else sensor_name[0]
             )
 
             sensor_data_list.append(

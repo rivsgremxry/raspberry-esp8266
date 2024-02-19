@@ -58,7 +58,7 @@ Installing and checking Python and pip version on Raspberry Pi
 ```
 
 ===========================================================================================
-## Installing Flask and creating a project
+## Installing Flask
 
 ### 1. Installing libraries for a Flask application:
 ```bash
@@ -67,37 +67,32 @@ Installing and checking Python and pip version on Raspberry Pi
   pip3 install schedule
   pip3 install pytz
 ```
+===========================================================================================
+## Installing git & repository cloning:
 
-### 2. Creating the structure of a Flask application (if you create it manually):
 ```bash
-  mkdir flask_esp8266_app
-  cd flask_esp8266_app
-  touch app.py
-  mkdir templates
-  touch templates/index.html
+  sudo apt install git
 ```
 
-### 3. Copy the code from the repository into your created files:
 ```bash
-  nano app.py (copy the code for app.py here);
-  nano /templates/index.html (copy the code for index.html here).
+  https://github.com/rivsgremxry/raspberry-esp8266.git
 ```
 
-### 4. Setting:
+### 1. Setting:
 ```bash
   Replace:
 * SQLALCHEMY_DATABASE_URI to your psql user, psql password & psql database name;
 * Set up the task scheduler or delete/comment it out if you don't need it.
 ```
 
-### 5. Launching a Flask application:
+### 2. Launching a Flask application:
 ```bash
   python app.py
 ```
 
 To check the functionality of the application, launch it and go to the address provided to us by the Flask application and make sure that everything works correctly
 
-### 6. Creating a service file to autostart the application:
+### 3. Creating a service file to autostart the application:
 ```bash
   sudo nano /etc/systemd/system/myflaskapp.service
 ```
@@ -119,17 +114,17 @@ Paste the following text (replace the paths with the correct ones):
   WantedBy=multi-user.target
 ```
 
-### 7. Restart systemd:
+### 4. Restart systemd:
 ```bash
   sudo systemctl daemon-reload
 ```
 
-### 8. Enable the service:
+### 5. Enable the service:
 ```bash
   sudo systemctl enable myflaskapp.service
 ```
 
-### 9. Start the service:
+### 6. Start the service:
 ```bash
   sudo systemctl start myflaskapp.service
 ```

@@ -18,11 +18,6 @@ app.config["SQLALCHEMY_DATABASE_URI"] = (
 # Create a SQLAlchemy database instance
 db = SQLAlchemy(app)
 
-# Shared variables for scheduler configuration
-scheduler_enabled = False
-schedule_type = "daily"
-selected_time = "00:00"
-
 
 # Define a database model for sensor data
 class SensorData(db.Model):
@@ -35,6 +30,14 @@ class SensorData(db.Model):
     )
 
 
+# Define a database model for scheduler configuration
+class SchedulerConfig(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    scheduler_enabled = db.Column(db.Boolean)
+    schedule_type = db.Column(db.String(20))
+    selected_time = db.Column(db.String(5))
+
+
 # Define a function to clear all data in the SensorData table
 def clear_data():
     with app.app_context():
@@ -45,17 +48,14 @@ def clear_data():
 
 # Define a function to configure and start the scheduled tasks
 def configure_schedule():
-    global scheduler_enabled, schedule_type, selected_time
-
     while True:
-        if scheduler_enabled:
-            if schedule_type == "daily":
-                schedule.every().day.at(selected_time).do(clear_data)
-            elif schedule_type == "weekly":
-                schedule.every().week.at(selected_time).do(clear_data)
+        config = SchedulerConfig.query.first()
 
-            # Reset scheduler configuration
-            scheduler_enabled = False
+        if config and config.scheduler_enabled:
+            if config.schedule_type == "daily":
+                schedule.every().day.at(config.selected_time).do(clear_data)
+            elif config.schedule_type == "weekly":
+                schedule.every().week.at(config.selected_time).do(clear_data)
 
         schedule.run_pending()
         time.sleep(1)
@@ -154,8 +154,6 @@ def add_data():
 # Define a route to configure the scheduler
 @app.route("/configure_schedule", methods=["GET", "POST"])
 def configure_schedule_route():
-    global scheduler_enabled, schedule_type, selected_time
-
     if request.method == "POST":
         # Retrieve form data
         toggle_status = request.form.get("toggle_status")
@@ -165,8 +163,42 @@ def configure_schedule_route():
         # Update scheduler settings based on form data
         scheduler_enabled = toggle_status == "on"
 
-    # Render the configuration template
-    return render_template("configure_schedule.html")
+        # Save or update the scheduler configuration in the database
+        config = SchedulerConfig.query.first()
+        if config:
+            config.scheduler_enabled = scheduler_enabled
+            config.schedule_type = schedule_type
+            config.selected_time = selected_time
+        else:
+            config = SchedulerConfig(
+                scheduler_enabled=scheduler_enabled,
+                schedule_type=schedule_type,
+                selected_time=selected_time,
+            )
+            db.session.add(config)
+
+        db.session.commit()
+
+    else:
+        # Retrieve scheduler configuration from the database
+        config = SchedulerConfig.query.first()
+
+        if config:
+            scheduler_enabled = config.scheduler_enabled
+            schedule_type = config.schedule_type
+            selected_time = config.selected_time
+        else:
+            scheduler_enabled = False
+            schedule_type = "daily"
+            selected_time = "00:00"
+
+    # Render the configuration template with scheduler settings
+    return render_template(
+        "configure_schedule.html",
+        scheduler_enabled=scheduler_enabled,
+        schedule_type=schedule_type,
+        selected_time=selected_time,
+    )
 
 
 # Start the scheduled tasks in a separate thread

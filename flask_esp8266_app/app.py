@@ -1,10 +1,11 @@
 # Import necessary libraries and modules
 from flask import Flask, request, render_template
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, timedelta
+from datetime import datetime
 import schedule
 import time
 import pytz
+from threading import Thread
 
 # Create a Flask web application
 app = Flask(__name__)
@@ -16,6 +17,11 @@ app.config["SQLALCHEMY_DATABASE_URI"] = (
 
 # Create a SQLAlchemy database instance
 db = SQLAlchemy(app)
+
+# Shared variables for scheduler configuration
+scheduler_enabled = False
+schedule_type = "daily"
+selected_time = "00:00"
 
 
 # Define a database model for sensor data
@@ -35,6 +41,24 @@ def clear_data():
         # Clear all data in the SensorData table
         SensorData.query.delete()
         db.session.commit()
+
+
+# Define a function to configure and start the scheduled tasks
+def configure_schedule():
+    global scheduler_enabled, schedule_type, selected_time
+
+    while True:
+        if scheduler_enabled:
+            if schedule_type == "daily":
+                schedule.every().day.at(selected_time).do(clear_data)
+            elif schedule_type == "weekly":
+                schedule.every().week.at(selected_time).do(clear_data)
+
+            # Reset scheduler configuration
+            scheduler_enabled = False
+
+        schedule.run_pending()
+        time.sleep(1)
 
 
 # Define the main route for rendering the index.html template
@@ -127,27 +151,33 @@ def add_data():
         return "Invalid data", 400
 
 
-# Schedule a daily task to clear data in the SensorData table at 00:00
-schedule.every().day.at("00:00").do(clear_data)
+# Define a route to configure the scheduler
+@app.route("/configure_schedule", methods=["GET", "POST"])
+def configure_schedule_route():
+    global scheduler_enabled, schedule_type, selected_time
 
+    if request.method == "POST":
+        # Retrieve form data
+        toggle_status = request.form.get("toggle_status")
+        schedule_type = request.form.get("schedule_type")
+        selected_time = request.form.get("selected_time")
 
-# Define a function to run the scheduled tasks in a separate thread
-def run_schedule():
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+        # Update scheduler settings based on form data
+        scheduler_enabled = toggle_status == "on"
+
+    # Render the configuration template
+    return render_template("configure_schedule.html")
 
 
 # Start the scheduled tasks in a separate thread
 if __name__ == "__main__":
-    from threading import Thread
-
-    scheduler_thread = Thread(target=run_schedule)
-    scheduler_thread.start()
-
     # Create the SensorData table if it doesn't exist
     with app.app_context():
         db.create_all()
+
+    # Configure and start the scheduled tasks
+    scheduler_thread = Thread(target=configure_schedule)
+    scheduler_thread.start()
 
     # Run the Flask application
     app.run(debug=True, host="0.0.0.0")
